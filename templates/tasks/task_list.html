@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load crispy_forms_filters %}
+
+{% block content %}
+  <h1 class="d-flex justify-content-between align-items-center">
+    TODO list
+    <a href="{% url 'tasks:task-create' %}" class="btn btn-primary link-to-page">
+      Add task
+    </a>
+  </h1>
+  {% if task_list %}
+    <p>
+      {% for task in task_list %}
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h3>{{ task.content }}</h3>
+            {% if task.is_done %}
+              <span style="color: green">Done</span>
+            {% else %}
+              <span style="color:red;">Not done</span>
+            {% endif %}
+          </div>
+          <form action="{% url 'tasks:toggle-task' pk=task.id %}" method="post">
+            {% csrf_token %}
+            {% if task.is_done %}
+              <button type="submit" class="btn btn-danger">
+                Undo
+              </button>
+            {% else %}
+              <button type="submit" class="btn btn-success">
+                Complete
+              </button>
+            {% endif %}
+          </form>
+        </div>
+        <p>Created: {{ task.created_at }}</p>
+        <p>Tags: {{ task.tags.all|join:", " }}</p>
+        <a href="{% url 'tasks:task-update' pk=task.id %}" class="btn btn-secondary link-to-page">
+          Update
+        </a>
+        <a href="{% url 'tasks:task-delete' pk=task.id %}" class="btn btn-danger link-to-page">
+          Delete
+        </a>
+        <hr>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no tasks!</p>
+  {% endif %}
+{% endblock %}
